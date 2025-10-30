@@ -1,0 +1,251 @@
+timestamp,tipo,detalle,usuario,peticion,nodo,codigo
+2025-10-27 23:16:08,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-27 23:16:52,LOGIN_OK,Inicio de sesión exitoso,juan,,1,200
+2025-10-27 23:16:52,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-27 23:16:52,PETICION,Petición recibida,juan,encender motor,1,200
+2025-10-27 23:19:41,LOGIN_OK,Inicio de sesión exitoso,camila,,1,200
+2025-10-27 23:19:41,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-27 23:19:41,PETICION,Petición recibida,camila,apagar motor,1,200
+2025-10-27 23:20:07,LOGIN_FAIL,Credenciales inválidas,julieta,,1,401
+2025-10-28 01:37:53,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-28 01:39:07,LOGIN_OK,Inicio de sesión exitoso,camila,,1,200
+2025-10-28 01:39:07,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-28 01:39:07,PETICION,Petición recibida,camila,M17,1,200
+2025-10-28 01:50:04,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-28 01:51:22,LOGIN_OK,Inicio de sesión exitoso,camila,,1,200
+2025-10-28 01:51:22,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-28 01:51:22,PETICION,Petición recibida,camila,apagar motores,1,200
+2025-10-28 03:01:15,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-28 03:01:41,LOGIN_OK,Inicio de sesión exitoso,camila,,1,200
+2025-10-28 03:01:41,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-28 03:01:41,EVENTO_INFO,Reporte generado para usuario camila,,,1,200
+2025-10-28 11:49:26,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-28 11:52:08,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-28 11:52:08,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-28 11:52:08,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-10-28 11:52:14,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-28 11:52:14,EVENTO_INFO,Usuario operario conectado,,,2,200
+2025-10-28 11:52:14,EVENTO_ERROR,Error al interpretar comando: home,,,2,400
+2025-10-28 11:52:21,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-28 11:52:21,EVENTO_INFO,Usuario operario conectado,,,3,200
+2025-10-28 11:52:21,EVENTO_INFO,Reporte generado para usuario agustina,,,3,200
+2025-10-28 11:52:33,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-28 11:52:33,EVENTO_INFO,Usuario operario conectado,,,4,200
+2025-10-28 11:52:33,EVENTO_ERROR,Error al interpretar comando: mover,,,4,400
+2025-10-28 11:52:39,LOGIN_OK,Inicio de sesión exitoso,agustina,,5,200
+2025-10-28 11:52:39,EVENTO_INFO,Usuario operario conectado,,,5,200
+2025-10-28 11:52:39,EVENTO_ERROR,"Error al interpretar comando: move (10,20)",,,5,400
+2025-10-28 11:52:43,LOGIN_OK,Inicio de sesión exitoso,agustina,,6,200
+2025-10-28 11:52:43,EVENTO_INFO,Usuario operario conectado,,,6,200
+2025-10-28 11:52:43,EVENTO_INFO,Reporte generado para usuario agustina,,,6,200
+2025-10-28 11:52:51,LOGIN_OK,Inicio de sesión exitoso,agustina,,7,200
+2025-10-28 11:52:51,EVENTO_INFO,Usuario operario conectado,,,7,200
+2025-10-28 11:52:51,EVENTO_ERROR,Error al interpretar comando: home,,,7,400
+2025-10-28 11:52:55,LOGIN_OK,Inicio de sesión exitoso,agustina,,8,200
+2025-10-28 11:52:55,EVENTO_INFO,Usuario operario conectado,,,8,200
+2025-10-28 11:52:55,PETICION,Petición recibida,agustina,apagar motores,8,200
+2025-10-28 11:53:04,LOGIN_OK,Inicio de sesión exitoso,agustina,,9,200
+2025-10-28 11:53:04,EVENTO_INFO,Usuario operario conectado,,,9,200
+2025-10-28 11:53:04,EVENTO_INFO,Reporte generado para usuario agustina,,,9,200
+2025-10-28 11:53:08,LOGIN_OK,Inicio de sesión exitoso,agustina,,10,200
+2025-10-28 11:53:08,EVENTO_INFO,Usuario operario conectado,,,10,200
+2025-10-28 11:53:08,EVENTO_ERROR,Error al interpretar comando: help,,,10,400
+2025-10-28 11:58:32,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-28 11:59:25,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-28 11:59:25,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-28 11:59:25,EVENTO_ERROR,Error al interpretar comando: 10 20 30,,,1,400
+2025-10-28 11:59:30,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-28 11:59:30,EVENTO_INFO,Usuario operario conectado,,,2,200
+2025-10-28 11:59:30,EVENTO_ERROR,Error al interpretar comando: mover brazo,,,2,400
+2025-10-28 11:59:40,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-28 11:59:40,EVENTO_INFO,Usuario operario conectado,,,3,200
+2025-10-28 11:59:40,EVENTO_ERROR,Error al interpretar comando: mover brazo,,,3,400
+2025-10-28 11:59:59,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-28 11:59:59,EVENTO_INFO,Usuario operario conectado,,,4,200
+2025-10-28 11:59:59,EVENTO_ERROR,Error al interpretar comando: mover brazo,,,4,400
+2025-10-28 12:00:13,LOGIN_OK,Inicio de sesión exitoso,agustina,,5,200
+2025-10-28 12:00:13,EVENTO_INFO,Usuario operario conectado,,,5,200
+2025-10-28 12:00:13,EVENTO_ERROR,Error al interpretar comando: x=10 y=5 z=3,,,5,400
+2025-10-28 12:00:32,LOGIN_OK,Inicio de sesión exitoso,agustina,,6,200
+2025-10-28 12:00:32,EVENTO_INFO,Usuario operario conectado,,,6,200
+2025-10-28 12:00:32,EVENTO_ERROR,Error al interpretar comando: x=<10> y=<5> z=<4>,,,6,400
+2025-10-28 12:00:38,LOGIN_OK,Inicio de sesión exitoso,agustina,,7,200
+2025-10-28 12:00:38,EVENTO_INFO,Usuario operario conectado,,,7,200
+2025-10-28 12:00:38,EVENTO_ERROR,Error al interpretar comando: mover brazo,,,7,400
+2025-10-28 12:00:47,LOGIN_OK,Inicio de sesión exitoso,agustina,,8,200
+2025-10-28 12:00:47,EVENTO_INFO,Usuario operario conectado,,,8,200
+2025-10-28 12:00:47,PETICION,Petición recibida,agustina,homing,8,200
+2025-10-28 12:00:52,LOGIN_OK,Inicio de sesión exitoso,agustina,,9,200
+2025-10-28 12:00:52,EVENTO_INFO,Usuario operario conectado,,,9,200
+2025-10-28 12:00:52,PETICION,Petición recibida,agustina,encender motores,9,200
+2025-10-28 12:01:01,LOGIN_OK,Inicio de sesión exitoso,agustina,,10,200
+2025-10-28 12:01:01,EVENTO_INFO,Usuario operario conectado,,,10,200
+2025-10-28 12:01:01,PETICION,Petición recibida,agustina,activar gripper,10,200
+2025-10-28 12:01:08,LOGIN_OK,Inicio de sesión exitoso,agustina,,11,200
+2025-10-28 12:01:08,EVENTO_INFO,Usuario operario conectado,,,11,200
+2025-10-28 12:01:08,EVENTO_INFO,Reporte generado para usuario agustina,,,11,200
+2025-10-28 12:01:26,LOGIN_OK,Inicio de sesión exitoso,agustina,,12,200
+2025-10-28 12:01:26,EVENTO_INFO,Usuario operario conectado,,,12,200
+2025-10-28 12:01:26,PETICION,Petición recibida,agustina,mover brazo x=0 y=170 z=120,12,200
+2025-10-28 12:01:30,LOGIN_OK,Inicio de sesión exitoso,agustina,,13,200
+2025-10-28 12:01:30,EVENTO_INFO,Usuario operario conectado,,,13,200
+2025-10-28 12:01:30,EVENTO_INFO,Reporte generado para usuario agustina,,,13,200
+2025-10-28 12:28:03,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-28 12:28:58,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-28 12:28:58,EVENTO_INFO,Usuario operario conectado,,,1,200
+2025-10-28 12:28:58,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-10-28 12:29:00,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-28 12:29:00,EVENTO_INFO,Usuario operario conectado,,,2,200
+2025-10-28 12:29:00,PETICION,Petición recibida,agustina,apagar motores,2,200
+2025-10-28 12:29:05,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-28 12:29:05,EVENTO_INFO,Usuario operario conectado,,,3,200
+2025-10-28 12:29:05,PETICION,Petición recibida,agustina,activar gripper,3,200
+2025-10-28 12:29:09,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-28 12:29:09,EVENTO_INFO,Usuario operario conectado,,,4,200
+2025-10-28 12:29:09,PETICION,Petición recibida,agustina,desactivar gripper,4,200
+2025-10-28 12:29:11,LOGIN_OK,Inicio de sesión exitoso,agustina,,5,200
+2025-10-28 12:29:11,EVENTO_INFO,Usuario operario conectado,,,5,200
+2025-10-28 12:29:11,PETICION,Petición recibida,agustina,activar gripper,5,200
+2025-10-28 12:29:15,LOGIN_OK,Inicio de sesión exitoso,agustina,,6,200
+2025-10-28 12:29:15,EVENTO_INFO,Usuario operario conectado,,,6,200
+2025-10-28 12:29:15,PETICION,Petición recibida,agustina,desactivar gripper,6,200
+2025-10-28 12:29:24,LOGIN_OK,Inicio de sesión exitoso,agustina,,7,200
+2025-10-28 12:29:24,EVENTO_INFO,Usuario operario conectado,,,7,200
+2025-10-28 12:29:24,PETICION,Petición recibida,agustina,homing,7,200
+2025-10-28 12:29:36,LOGIN_OK,Inicio de sesión exitoso,agustina,,8,200
+2025-10-28 12:29:36,EVENTO_INFO,Usuario operario conectado,,,8,200
+2025-10-28 12:29:36,PETICION,Petición recibida,agustina,modo absoluto,8,200
+2025-10-28 12:29:37,LOGIN_OK,Inicio de sesión exitoso,agustina,,9,200
+2025-10-28 12:29:37,EVENTO_INFO,Usuario operario conectado,,,9,200
+2025-10-28 12:29:37,PETICION,Petición recibida,agustina,modo relativo,9,200
+2025-10-28 12:29:39,LOGIN_OK,Inicio de sesión exitoso,agustina,,10,200
+2025-10-28 12:29:39,EVENTO_INFO,Usuario operario conectado,,,10,200
+2025-10-28 12:29:39,PETICION,Petición recibida,agustina,modo absoluto,10,200
+2025-10-28 12:29:47,LOGIN_OK,Inicio de sesión exitoso,agustina,,11,200
+2025-10-28 12:29:47,EVENTO_INFO,Usuario operario conectado,,,11,200
+2025-10-28 12:29:47,PETICION,Petición recibida,agustina,mover brazo x=0,11,200
+2025-10-28 12:29:54,LOGIN_OK,Inicio de sesión exitoso,agustina,,12,200
+2025-10-28 12:29:54,EVENTO_INFO,Usuario operario conectado,,,12,200
+2025-10-28 12:29:54,PETICION,Petición recibida,agustina,mover brazo x=1 y=10000,12,200
+2025-10-28 12:30:23,LOGIN_OK,Inicio de sesión exitoso,agustina,,13,200
+2025-10-28 12:30:23,EVENTO_INFO,Usuario operario conectado,,,13,200
+2025-10-28 12:30:23,EVENTO_INFO,Reporte generado para usuario agustina,,,13,200
+2025-10-28 12:33:57,LOGIN_OK,Inicio de sesión exitoso,agustina,,14,200
+2025-10-28 12:33:57,EVENTO_INFO,Usuario operario conectado,,,14,200
+2025-10-28 12:33:57,EVENTO_ERROR,Error al interpretar comando: pwd,,,14,400
+2025-10-28 12:34:14,LOGIN_OK,Inicio de sesión exitoso,agustina,,15,200
+2025-10-28 12:34:14,EVENTO_INFO,Usuario operario conectado,,,15,200
+2025-10-28 12:34:14,EVENTO_ERROR,Error al interpretar comando: ls -l pruebas.gcode,,,15,400
+2025-10-28 12:34:16,LOGIN_OK,Inicio de sesión exitoso,agustina,,16,200
+2025-10-28 12:34:16,EVENTO_INFO,Usuario operario conectado,,,16,200
+2025-10-28 12:34:16,EVENTO_ERROR,Error al interpretar comando: ls,,,16,400
+2025-10-28 12:34:20,LOGIN_OK,Inicio de sesión exitoso,agustina,,17,200
+2025-10-28 12:34:20,EVENTO_INFO,Usuario operario conectado,,,17,200
+2025-10-28 12:34:20,EVENTO_ERROR,Error al interpretar comando: pwd,,,17,400
+2025-10-28 12:35:09,LOGIN_OK,Inicio de sesión exitoso,agustina,,18,200
+2025-10-28 12:35:09,EVENTO_INFO,Usuario operario conectado,,,18,200
+2025-10-28 12:35:09,EVENTO_ERROR,Error al interpretar comando: pwd ./bin/client 127.0.0.1 8080,,,18,400
+2025-10-29 17:23:33,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-29 17:24:12,LOGIN_FAIL,Credenciales inválidas,agustina,,1,401
+2025-10-29 17:24:20,LOGIN_FAIL,Credenciales inválidas,agustina,,2,401
+2025-10-29 17:24:50,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-29 17:24:50,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-10-29 17:24:53,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-29 17:24:53,PETICION,Petición recibida,agustina,apagar motores,2,200
+2025-10-29 17:25:28,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-29 17:25:28,PETICION,Petición recibida,agustina,upload prueba.gcode,3,200
+2025-10-29 17:25:33,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-29 17:25:33,PETICION,Petición recibida,agustina,run prueba.gcode,4,200
+2025-10-29 18:14:44,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-29 18:15:07,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-29 18:15:07,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-10-29 18:15:08,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-29 18:15:08,PETICION,Petición recibida,agustina,apagar motores,2,200
+2025-10-29 18:15:27,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-29 18:15:27,EVENTO_WARNING,Intento cambiar acceso remoto sin privilegios,,,3,400
+2025-10-29 18:15:36,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-29 18:15:36,EVENTO_WARNING,Intento cambiar acceso remoto sin privilegios,,,4,400
+2025-10-29 18:16:25,LOGIN_OK,Inicio de sesión exitoso,cesar,,1,200
+2025-10-29 18:16:25,PETICION,Petición recibida,cesar,encender motores,1,200
+2025-10-29 18:16:26,LOGIN_OK,Inicio de sesión exitoso,cesar,,2,200
+2025-10-29 18:16:26,EVENTO_ERROR,Error al interpretar comando: ogg,,,2,400
+2025-10-29 18:16:48,LOGIN_OK,Inicio de sesión exitoso,cesar,,3,200
+2025-10-29 18:16:48,EVENTO_INFO,Acceso remoto: OFF,,,3,200
+2025-10-29 18:17:03,LOGIN_OK,Inicio de sesión exitoso,cesar,,4,200
+2025-10-29 18:17:03,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: encender motores,,,4,400
+2025-10-29 18:17:07,LOGIN_OK,Inicio de sesión exitoso,cesar,,5,200
+2025-10-29 18:17:07,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: apagar motores,,,5,400
+2025-10-29 18:17:09,LOGIN_OK,Inicio de sesión exitoso,cesar,,6,200
+2025-10-29 18:17:09,EVENTO_INFO,Reporte generado para cesar,,,6,200
+2025-10-29 18:17:19,LOGIN_OK,Inicio de sesión exitoso,cesar,,7,200
+2025-10-29 18:17:19,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: activar gripper,,,7,400
+2025-10-29 18:17:21,LOGIN_OK,Inicio de sesión exitoso,cesar,,8,200
+2025-10-29 18:17:21,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: desactivar gripper,,,8,400
+2025-10-29 18:17:23,LOGIN_OK,Inicio de sesión exitoso,cesar,,9,200
+2025-10-29 18:17:23,EVENTO_INFO,Acceso remoto: ON,,,9,200
+2025-10-29 18:17:25,LOGIN_OK,Inicio de sesión exitoso,cesar,,10,200
+2025-10-29 18:17:25,PETICION,Petición recibida,cesar,activar gripper,10,200
+2025-10-29 18:17:27,LOGIN_OK,Inicio de sesión exitoso,cesar,,11,200
+2025-10-29 18:17:27,PETICION,Petición recibida,cesar,desactivar gripper,11,200
+2025-10-29 18:17:28,LOGIN_OK,Inicio de sesión exitoso,cesar,,12,200
+2025-10-29 18:17:28,PETICION,Petición recibida,cesar,encender motores,12,200
+2025-10-29 18:17:29,LOGIN_OK,Inicio de sesión exitoso,cesar,,13,200
+2025-10-29 18:17:29,PETICION,Petición recibida,cesar,apagar motores,13,200
+2025-10-29 18:17:41,LOGIN_OK,Inicio de sesión exitoso,cesar,,14,200
+2025-10-29 18:17:46,LOGIN_OK,Inicio de sesión exitoso,cesar,,15,200
+2025-10-29 18:17:46,EVENTO_ERROR,Error al interpretar comando: clear,,,15,400
+2025-10-29 18:18:10,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-29 18:18:10,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-10-29 18:18:19,LOGIN_OK,Inicio de sesión exitoso,cesar,,16,200
+2025-10-29 18:18:19,EVENTO_INFO,Acceso remoto: OFF,,,16,200
+2025-10-29 18:18:23,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-29 18:18:23,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: apagar motores,,,2,400
+2025-10-29 18:18:25,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-29 18:18:25,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: encender motores,,,3,400
+2025-10-29 18:18:31,LOGIN_OK,Inicio de sesión exitoso,cesar,,17,200
+2025-10-29 18:18:31,EVENTO_INFO,Acceso remoto: ON,,,17,200
+2025-10-29 18:18:35,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-29 18:18:35,PETICION,Petición recibida,agustina,encender motores,4,200
+2025-10-29 18:18:37,LOGIN_OK,Inicio de sesión exitoso,agustina,,5,200
+2025-10-29 18:18:37,PETICION,Petición recibida,agustina,apagar motores,5,200
+2025-10-29 18:18:57,LOGIN_OK,Inicio de sesión exitoso,agustina,,6,200
+2025-10-29 18:18:57,EVENTO_WARNING,Intento leer log sin privilegios,,,6,400
+2025-10-29 18:19:06,LOGIN_OK,Inicio de sesión exitoso,cesar,,18,200
+2025-10-29 19:15:37,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-29 19:17:13,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-29 19:17:15,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-29 19:17:15,PETICION,Petición recibida,agustina,encender motores,2,200
+2025-10-29 19:17:17,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-29 19:17:17,PETICION,Petición recibida,agustina,apagar motores,3,200
+2025-10-29 19:17:26,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-29 19:17:26,PETICION,Petición recibida,agustina,upload prueba.gcode,4,200
+2025-10-29 19:17:30,LOGIN_OK,Inicio de sesión exitoso,agustina,,5,200
+2025-10-29 19:17:30,PETICION,Petición recibida,agustina,run prueba.gcode,5,200
+2025-10-29 19:17:45,LOGIN_OK,Inicio de sesión exitoso,cesar,,1,200
+2025-10-29 19:17:52,LOGIN_OK,Inicio de sesión exitoso,cesar,,2,200
+2025-10-29 19:17:52,EVENTO_INFO,Acceso remoto: OFF,,,2,200
+2025-10-29 19:18:12,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-29 19:18:12,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: encender motores,,,1,400
+2025-10-29 19:18:15,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-29 19:18:15,EVENTO_INFO,Peticion rechazada por acceso remoto OFF: apagar motores,,,2,400
+2025-10-29 19:18:22,LOGIN_OK,Inicio de sesión exitoso,cesar,,3,200
+2025-10-29 19:18:22,EVENTO_INFO,Acceso remoto: ON,,,3,200
+2025-10-29 19:18:29,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-29 19:18:29,PETICION,Petición recibida,agustina,encender motores,3,200
+2025-10-29 19:18:30,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-29 19:18:30,PETICION,Petición recibida,agustina,apagar motores,4,200
+2025-10-29 19:23:43,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-10-29 19:24:28,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-10-29 19:24:28,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-10-29 19:24:41,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-10-29 19:24:41,PETICION,Petición recibida,agustina,mover brazo x=10.0 y=10.0 z=10.0,2,200
+2025-10-29 19:24:54,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-10-29 19:24:54,EVENTO_INFO,Reporte generado para agustina,,,3,200
+2025-10-29 19:25:09,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-10-29 19:25:09,EVENTO_WARNING,Intento cambiar acceso remoto sin privilegios,,,4,400
+2025-10-29 19:25:14,LOGIN_OK,Inicio de sesión exitoso,agustina,,5,200
+2025-10-29 19:25:14,PETICION,Petición recibida,agustina,modo relativo,5,200
+2025-10-29 19:25:24,LOGIN_OK,Inicio de sesión exitoso,agustina,,6,200
+2025-10-29 19:25:24,PETICION,Petición recibida,agustina,upload prueba.gcode,6,200
+2025-10-29 19:25:39,LOGIN_OK,Inicio de sesión exitoso,agustina,,7,200
+2025-10-29 19:25:39,PETICION,Petición recibida,agustina,run prueba.gcode,7,200
