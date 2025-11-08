@@ -2,55 +2,100 @@
 #  Proyecto Integrador XML-RPC
 # ===============================
 
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Iinclude
-SRC_DIR = src
-APP_DIR = app
-BIN_DIR = bin
+CXX := g++
+CXXFLAGS := -std=c++17 -Wall -Iinclude
+SRC_DIR := src
+APP_DIR := app
+BIN_DIR := bin
 
-# Archivos fuente principales (C++)
-SRCS = $(wildcard $(SRC_DIR)/*.cpp $(APP_DIR)/*.cpp)
-OBJS = $(SRCS:.cpp=.o)
+LIBS := -lpthread -ldl -lsqlite3
 
-# Librerías necesarias
-LIBS = -lpthread -ldl -lsqlite3
+# Objetos comunes a server/cliente(s)
+COMMON_OBJS := \
+  $(SRC_DIR)/Mensaje.o \
+  $(SRC_DIR)/Usuario.o \
+  $(SRC_DIR)/ValidadorUsuario.o \
+  $(SRC_DIR)/PALogger.o \
+  $(SRC_DIR)/InterpreteDeComandos.o \
+  $(SRC_DIR)/Reporte.o \
+  $(SRC_DIR)/Archivo.o
+
+# Objetos de la librería XML-RPC
+XMLRPC_OBJS := \
+  $(SRC_DIR)/XmlRpcClient.o \
+  $(SRC_DIR)/XmlRpcDispatch.o \
+  $(SRC_DIR)/XmlRpcServer.o \
+  $(SRC_DIR)/XmlRpcServerConnection.o \
+  $(SRC_DIR)/XmlRpcServerMethod.o \
+  $(SRC_DIR)/XmlRpcSocket.o \
+  $(SRC_DIR)/XmlRpcSource.o \
+  $(SRC_DIR)/XmlRpcUtil.o \
+  $(SRC_DIR)/XmlRpcValue.o
 
 # Ejecutables
-SERVER = $(BIN_DIR)/server
-CLIENT = $(BIN_DIR)/client
-CLIENTCMD = $(BIN_DIR)/clientcmd
+SERVER := $(BIN_DIR)/server
+CLIENT := $(BIN_DIR)/client
+CLIENTCMD := $(BIN_DIR)/clientcmd
 
 # ===============================
-#  Targets principales
+#  Reglas de compilación
 # ===============================
 
 all: $(SERVER) $(CLIENT) $(CLIENTCMD)
 
-$(SERVER): $(OBJS)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) -o $@ $(filter %server.o,$(OBJS)) $(filter %XmlRpc%.o,$(OBJS)) $(filter %Mensaje.o,$(OBJS)) \
-	$(filter %Usuario.o,$(OBJS)) $(filter %ValidadorUsuario.o,$(OBJS)) $(filter %PALogger.o,$(OBJS)) \
-	$(filter %InterpreteDeComandos.o,$(OBJS)) $(filter %Reporte.o,$(OBJS)) $(filter %Archivo.o,$(OBJS)) $(LIBS)
+# Compilación genérica de .cpp -> .o
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(CLIENT): $(OBJS)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) -o $@ $(filter %client.o,$(OBJS)) $(filter %Mensaje.o,$(OBJS)) $(filter %XmlRpc%.o,$(OBJS)) $(LIBS)
+$(APP_DIR)/%.o: $(APP_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(CLIENTCMD): $(OBJS)
+# -------------------------------
+#  Link de cada binario
+# -------------------------------
+
+# Servidor: main en app/server.cpp
+$(SERVER): $(APP_DIR)/server.o $(COMMON_OBJS) $(XMLRPC_OBJS)
 	@mkdir -p $(BIN_DIR)
-	$(CXX) -o $@ $(filter %clientcmd.o,$(OBJS)) $(filter %Mensaje.o,$(OBJS)) $(filter %XmlRpc%.o,$(OBJS)) $(LIBS)
+	$(CXX) -o $@ $^ $(LIBS)
+
+# Cliente simple: main en app/client.cpp
+$(CLIENT): $(APP_DIR)/client.o $(SRC_DIR)/Mensaje.o $(XMLRPC_OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) -o $@ $^ $(LIBS)
+
+# Cliente comandos: main en app/clientcmd.cpp
+$(CLIENTCMD): $(APP_DIR)/clientcmd.o $(SRC_DIR)/Mensaje.o $(XMLRPC_OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) -o $@ $^ $(LIBS)
 
 # ===============================
-#  Clientes Python
+#  Clientes Python (opcional)
 # ===============================
 
-# Ejecuta el cliente Python (versión básica)
 client_py:
 	python3 $(APP_DIR)/client_rpc.py 127.0.0.1 8080
 
-# Ejecuta el cliente Python con menú CLI
 client_py_cli:
 	python3 $(APP_DIR)/client_cli.py 127.0.0.1 8080
+	
+client_gui:
+	python3 $(APP_DIR)/interfaz_cl.py
+
+client_pkg:
+	python3 $(APP_DIR)/client_pkg_main.py 127.0.0.1 8080
+
+# ===============================
+#  Tests (si agregaste tests/tests.cpp)
+# ===============================
+
+TESTS := $(BIN_DIR)/tests
+test: $(TESTS)
+	./$(TESTS)
+
+$(TESTS): $(wildcard $(SRC_DIR)/*.cpp) tests/tests.cpp
+	@mkdir -p $(BIN_DIR)
+	$(CXX) -std=c++17 -Wall -Iinclude $^ -o $@ $(LIBS)
 
 # ===============================
 #  Utilidades
@@ -62,5 +107,5 @@ clean:
 
 rebuild: clean all
 
-.PHONY: all clean rebuild client_py client_py_cli
+.PHONY: all clean rebuild client_py client_py_cli client_pkg test
 

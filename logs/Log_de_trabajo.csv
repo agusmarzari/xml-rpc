@@ -249,3 +249,12 @@ timestamp,tipo,detalle,usuario,peticion,nodo,codigo
 2025-10-29 19:25:24,PETICION,Petición recibida,agustina,upload prueba.gcode,6,200
 2025-10-29 19:25:39,LOGIN_OK,Inicio de sesión exitoso,agustina,,7,200
 2025-10-29 19:25:39,PETICION,Petición recibida,agustina,run prueba.gcode,7,200
+2025-11-08 16:50:49,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-11-08 16:53:19,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-11-08 16:56:28,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-11-08 16:56:38,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-11-08 16:56:38,PETICION,Petición recibida,agustina,encender motores,2,200
+2025-11-08 16:56:40,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-11-08 16:56:40,PETICION,Petición recibida,agustina,apagar motores,3,200
+2025-11-08 18:40:42,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-11-08 18:41:10,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
