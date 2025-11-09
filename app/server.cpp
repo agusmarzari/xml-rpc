@@ -1,4 +1,3 @@
-// app/server.cpp
 #include <iostream>
 #include <string>
 #include <variant>
@@ -9,6 +8,8 @@
 #include <deque>
 #include <mutex>
 #include <atomic>
+#include <algorithm>
+#include <iterator>
 
 #include "XmlRpc.h"
 #include "Mensaje.h"
@@ -18,6 +19,7 @@
 #include "InterpreteDeComandos.h"
 #include "Reporte.h"
 #include "base64.h"
+#include "Controlador.h"   // <<<< agregado
 
 using namespace XmlRpc;
 
@@ -64,7 +66,7 @@ static bool from_base64(const std::string& b64, std::string& binOut) {
     int iostatus = 0;
     auto it = std::back_inserter(out);
     decoder.get(b64.begin(), b64.end(), it, iostatus);
-    if (iostatus != 0) return false; // sin base64<>::eof()
+    if (iostatus != 0) return false;
     binOut.assign(out.begin(), out.end());
     return true;
 }
@@ -86,8 +88,43 @@ static bool saveFile(const std::string& fname, const std::string& data) {
 
 // ===== Método remoto =====
 class RecibirMensaje : public XmlRpcServerMethod {
+private:
+    // <<< integración Controlador >>>
+    Controlador controlador_;
+    std::atomic<bool> robotConectado_{false};
+
 public:
-    RecibirMensaje(XmlRpcServer* s) : XmlRpcServerMethod("RecibirMensaje", s) {}
+    RecibirMensaje(XmlRpcServer* s) : XmlRpcServerMethod("RecibirMensaje", s) {
+        // No conectar en el constructor para evitar bloqueos o excepciones
+        // al iniciar el servidor (puerto serie puede no estar disponible).
+        auto& logger = PALogger::getInstance();
+        logger.logEvento(PALogger::LogLevel::INFO,
+                         "RecibirMensaje inicializado (conexion serie diferida)",
+                         PALogger::Code::OK);
+    }
+
+    // Intento seguro de conexión al robot. Llamar desde main() tras bindAndListen
+    void conectarRobot() {
+        auto& logger = PALogger::getInstance();
+        try {
+            bool ok = controlador_.conectar();
+            robotConectado_.store(ok);
+            if (ok) {
+                logger.logEvento(PALogger::LogLevel::INFO,
+                                 "Conexión serie con robot establecida",
+                                 PALogger::Code::OK);
+            } else {
+                logger.logEvento(PALogger::LogLevel::WARNING,
+                                 "No se pudo establecer conexión serie con el robot",
+                                 PALogger::Code::SERVER_ERROR);
+            }
+        } catch (const std::exception& e) {
+            robotConectado_.store(false);
+            logger.logEvento(PALogger::LogLevel::ERROR,
+                             std::string("Excepcion al conectar robot: ") + e.what(),
+                             PALogger::Code::SERVER_ERROR);
+        }
+    }
 
     void execute(XmlRpcValue& params, XmlRpcValue& result) override {
         auto& logger = PALogger::getInstance();
@@ -150,7 +187,8 @@ public:
                 "  upload <archivo.gcode> | run <archivo.gcode>\n"
                 "Comandos admin:\n"
                 "  admin acceso on | admin acceso off\n"
-                "  admin log N  (ultimas N lineas del log)\n";
+                "  admin log N  (ultimas N lineas del log)\n"
+                "  conectar robot | desconectar robot (solo admin)\n";
             result = helpTxt;
             return;
         }
@@ -198,6 +236,56 @@ public:
             logger.logEvento(PALogger::LogLevel::INFO,
                              "Peticion rechazada por acceso remoto OFF: " + peticion,
                              PALogger::Code::BAD_REQUEST, msg.getID());
+            return;
+        }
+
+        // ===== NUEVO: Control del robot (conectar / desconectar) =====
+        if (peticion == "desconectar robot") {
+            if (!usuario.esAdmin()) {
+                result = "Permiso denegado: solo el administrador puede desconectar el robot.";
+                logger.logEvento(PALogger::LogLevel::WARNING,
+                                 "Intento de desconectar robot sin privilegios",
+                                 PALogger::Code::BAD_REQUEST, msg.getID());
+                return;
+            }
+            if (robotConectado_.load()) {
+                controlador_.desconectar();
+                robotConectado_.store(false);
+                logger.logEvento(PALogger::LogLevel::INFO,
+                                 "Robot desconectado por administrador",
+                                 PALogger::Code::OK, msg.getID());
+                result = "Robot desconectado.";
+            } else {
+                result = "El robot ya estaba desconectado.";
+            }
+            return;
+        }
+
+        if (peticion == "conectar robot") {
+            if (!usuario.esAdmin()) {
+                result = "Permiso denegado: solo el administrador puede conectar el robot.";
+                logger.logEvento(PALogger::LogLevel::WARNING,
+                                 "Intento de conectar robot sin privilegios",
+                                 PALogger::Code::BAD_REQUEST, msg.getID());
+                return;
+            }
+            if (!robotConectado_.load()) {
+                bool ok = controlador_.conectar();
+                robotConectado_.store(ok);
+                if (ok) {
+                    logger.logEvento(PALogger::LogLevel::INFO,
+                                     "Robot conectado por administrador",
+                                     PALogger::Code::OK, msg.getID());
+                    result = "Robot conectado correctamente.";
+                } else {
+                    logger.logEvento(PALogger::LogLevel::ERROR,
+                                     "Fallo al conectar robot por administrador",
+                                     PALogger::Code::SERVER_ERROR, msg.getID());
+                    result = "Error al conectar el robot.";
+                }
+            } else {
+                result = "El robot ya estaba conectado.";
+            }
             return;
         }
 
@@ -263,16 +351,33 @@ public:
                 return;
             }
 
-            // Simulación: leer líneas (aquí iría el envío real al controlador/serial)
+            // Envío real: leer línea a línea y mandar al controlador si está conectado
+            if (!robotConectado_.load()) {
+                result = "Error: archivo listo pero robot desconectado. Use 'conectar robot' si es admin.";
+                logger.logEvento(PALogger::LogLevel::WARNING,
+                                 "Run pedido pero robot desconectado: " + fname,
+                                 PALogger::Code::BAD_REQUEST, msg.getID());
+                f.close();
+                return;
+            }
+
             std::string line; size_t n = 0;
+            std::ostringstream respLog;
             while (std::getline(f, line)) {
-                if (line.empty()) continue;
+                // Normalizar/recortar la línea (elimina espacios alrededor)
+                line = trim(line);
+                if (line.empty()) continue; // ignorar líneas vacías
+
                 ++n;
+                // Enviar al controlador y registrar la respuesta
+                std::string respuesta = controlador_.enviarComandoGcode(line);
+                respLog << "L" << n << ": `" << line << "` -> `" << respuesta << "`\n";
             }
             f.close();
 
             logger.logPeticion(usuario.getNombre(), "run " + fname, msg.getID(), PALogger::Code::OK);
-            result = "Ejecucion encolada: " + fname + " (" + std::to_string(n) + " lineas)";
+            // Resumen: número de líneas y registro con respuestas (puede ser largo)
+            result = std::string("Ejecucion completada: ") + fname + " (" + std::to_string(n) + " lineas)\n" + respLog.str();
             return;
         }
 
@@ -283,9 +388,13 @@ public:
         if (peticion == "reporte") {
             Reporte reporte(usuario.getNombre());
             reporte.CargarOrdenes_Log();
-            // Estado simulado (cuando integren controlador, completar)
-            reporte.SetEstadoROBOT("Posicion X:10 Y:20 Z:30");
-            reporte.SetEstadoConexion(true);
+
+            std::string estado = "ROBOT DESCONECTADO";
+            if (robotConectado_.load()) {
+                estado = controlador_.enviarComandoGcode("M114");
+            }
+            reporte.SetEstadoROBOT(estado);
+            reporte.SetEstadoConexion(robotConectado_.load());  // <<<< usa el estado real
 
             std::string reporteTexto = reporte.Serializar();
             logger.logEvento(PALogger::LogLevel::INFO,
@@ -314,14 +423,24 @@ public:
 
         logger.logPeticion(usuario.getNombre(), peticion, msg.getID(), PALogger::Code::OK);
 
-        // Aquí iría el envío al controlador real (serial)
-        // Controlador ctrl; ctrl.ejecutarComando(comandoGcode);
+        // ==== Envío real al controlador, si hay conexión ====
+        if (!robotConectado_.load()) {
+            result = "Error: robot desconectado. (Use 'conectar robot' si es admin)";
+            logger.logEvento(PALogger::LogLevel::WARNING,
+                             "Intento de comando con robot desconectado",
+                             PALogger::Code::BAD_REQUEST, msg.getID());
+            return;
+        }
 
-        result = "Peticion procesada correctamente: " + std::string(comandoGcode);
+        std::string respuestaArduino = controlador_.enviarComandoGcode(comandoGcode);
+
+        result = "Peticion procesada: " + std::string(comandoGcode) +
+                 " | Arduino: " + respuestaArduino;
     }
 
     std::string help() override {
-        return "Valida usuario, maneja admin acceso/log, upload/run, 'reporte' y traduccion a G-code.";
+        return "Valida usuario, maneja admin acceso/log, upload/run, 'reporte' y traduccion a G-code, "
+               "con robot serie conectado por defecto, y admin: conectar/desconectar.";
     }
 };
 
@@ -342,12 +461,15 @@ int main(int argc, char* argv[]) {
     XmlRpc::setVerbosity(1);
 
     try {
-        server.bindAndListen(port);
-        std::cout << "Servidor escuchando en puerto " << port << ".\n";
-        logger.logEvento(PALogger::LogLevel::INFO,
-                         "Servidor escuchando en puerto " + std::to_string(port));
+    server.bindAndListen(port);
+    std::cout << "Servidor escuchando en puerto " << port << ".\n";
+    logger.logEvento(PALogger::LogLevel::INFO,
+             "Servidor escuchando en puerto " + std::to_string(port));
 
-        server.work(-1.0); // loop principal
+    // Intento seguro de conectar al robot (si el hardware/puerto está disponible)
+    recibir.conectarRobot();
+
+    server.work(-1.0); // loop principal
     } catch (const std::exception& e) {
         std::cerr << "Error en el servidor: " << e.what() << std::endl;
         logger.logEvento(PALogger::LogLevel::ERROR,
@@ -359,4 +481,3 @@ int main(int argc, char* argv[]) {
     logger.logEvento(PALogger::LogLevel::INFO, "Servidor finalizado correctamente");
     return 0;
 }
-
