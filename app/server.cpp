@@ -10,6 +10,8 @@
 #include <atomic>
 #include <algorithm>
 #include <iterator>
+#include <thread>
+#include <chrono>
 
 #include "XmlRpc.h"
 #include "Mensaje.h"
@@ -183,7 +185,7 @@ public:
             std::string helpTxt =
                 "Comandos usuario:\n"
                 "  on | off | grip on | grip off | home | reporte | status\n"
-                "  abs | rel | move x=.. y=.. z=..\n"
+                "  abs | rel | mover x=.. y=.. z=..\n"
                 "  upload <archivo.gcode> | run <archivo.gcode>\n"
                 "Comandos admin:\n"
                 "  admin acceso on | admin acceso off\n"
@@ -372,6 +374,8 @@ public:
                 // Enviar al controlador y registrar la respuesta
                 std::string respuesta = controlador_.enviarComandoGcode(line);
                 respLog << "L" << n << ": `" << line << "` -> `" << respuesta << "`\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
             }
             f.close();
 
