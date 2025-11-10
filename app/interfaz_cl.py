@@ -3,50 +3,49 @@
 """
 interfaz_cl.py
 
-Provides class `interfaz_cl` — a simple tkinter GUI client that uses the
-helpers in `client_rpc.py` (Session, serialize_message, parse_mensaje,
-normalize, b64_of_file) to connect to the XML-RPC server and send/receive
-messages. This file does NOT modify `client_rpc.py` and imports from it.
+Interfaz gráfica del cliente XML-RPC.
+Usa el paquete `cliente` (ClienteRPC, Usuario) para conectarse al servidor.
 
-Usage: python interfaz_cl.py
+Requiere:
+    - cliente/cliente.py
+    - cliente/usuario.py
+    - cliente/mensaje.py
+    - cliente/interfaz.py
+
+Ejecución:
+    python interfaz_cl.py
 """
-from __future__ import annotations
 
 import os
 import traceback
-import xmlrpc.client
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 
-# Import helpers from existing client_rpc.py (file must remain unchanged)
-from client_rpc import Session, serialize_message, parse_mensaje, normalize, b64_of_file
+# Importar la versión modular del cliente
+from cliente.cliente import ClienteRPC
+from cliente.usuario import Usuario
 
 
-class interfaz_cl:
-    """GUI client to connect to the XML-RPC server and send commands.
-
-    Public methods:
-    - run(): start the Tk mainloop
-
-    The GUI collects IP, port, username and password then allows sending
-    commands, uploading a file and requesting the server to run a file.
-    """
+class InterfazCL:
+    """GUI del cliente RPC (Tkinter). Permite conectar, enviar comandos,
+    subir y ejecutar archivos GCODE."""
 
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Interfaz Cliente RPC")
+        self.root.title("Cliente RPC - GUI")
         self.root.geometry("760x520")
 
-        self.proxy = None
-        self.session = None
+        self.cliente = None  # instancia de ClienteRPC
 
         self._build_widgets()
+
+    # ---------------------- Construcción de interfaz ----------------------
 
     def _build_widgets(self):
         frm = ttk.Frame(self.root, padding=10)
         frm.pack(fill=tk.BOTH, expand=True)
 
-        # Connection frame
+        # --- Conexión ---
         conn = ttk.LabelFrame(frm, text="Conexión")
         conn.pack(fill=tk.X, padx=4, pady=4)
 
@@ -72,7 +71,7 @@ class interfaz_cl:
         self.status_lbl = ttk.Label(conn, text="No conectado", foreground="red")
         self.status_lbl.grid(row=0, column=9, padx=6)
 
-        # Commands frame
+        # --- Comandos ---
         cmdfrm = ttk.LabelFrame(frm, text="Comandos / Acciones")
         cmdfrm.pack(fill=tk.X, padx=4, pady=6)
 
@@ -83,7 +82,7 @@ class interfaz_cl:
         self.send_btn = ttk.Button(cmdfrm, text="Enviar", command=self.send_command, state=tk.DISABLED)
         self.send_btn.grid(row=0, column=7, padx=4)
 
-        # Upload / Run
+        # --- Upload / Run ---
         self.upload_btn = ttk.Button(cmdfrm, text="Upload archivo...", command=self.upload_file, state=tk.DISABLED)
         self.upload_btn.grid(row=1, column=1, pady=6)
 
@@ -93,23 +92,28 @@ class interfaz_cl:
         self.run_btn = ttk.Button(cmdfrm, text="Run", command=self.run_file, state=tk.DISABLED)
         self.run_btn.grid(row=1, column=5)
 
-        # Log / responses
+        # --- Log / Respuestas ---
         logfrm = ttk.LabelFrame(frm, text="Registro / Respuestas")
         logfrm.pack(fill=tk.BOTH, expand=True, padx=4, pady=6)
 
         self.log = scrolledtext.ScrolledText(logfrm, wrap=tk.WORD, height=18)
         self.log.pack(fill=tk.BOTH, expand=True)
 
-        # Footer
+        # --- Footer ---
         foot = ttk.Frame(frm)
         foot.pack(fill=tk.X, pady=6)
         ttk.Button(foot, text="Limpiar log", command=lambda: self.log.delete("1.0", tk.END)).pack(side=tk.LEFT)
         ttk.Button(foot, text="Cerrar", command=self.on_close).pack(side=tk.RIGHT)
 
+    # ---------------------- Funciones auxiliares ----------------------
+
     def append_log(self, *lines: object):
+        """Agrega texto al área de log."""
         for l in lines:
             self.log.insert(tk.END, str(l) + "\n")
         self.log.see(tk.END)
+
+    # ---------------------- Conexión ----------------------
 
     def connect(self):
         ip = self.ip_var.get().strip()
@@ -129,28 +133,24 @@ class interfaz_cl:
 
         url = f"http://{ip}:{port_i}"
         try:
-            proxy = xmlrpc.client.ServerProxy(url, allow_none=True)
-            # quick ping: try a harmless call - RecibirMensaje requires message; we skip calling it here
-            # Build session
-            sess = Session(url=url, user=user, password=pwd)
+            usuario = Usuario(user, pwd)
+            self.cliente = ClienteRPC(url, usuario)
 
-            # Save
-            self.proxy = proxy
-            self.session = sess
-
-            # enable UI
             self.send_btn.config(state=tk.NORMAL)
             self.upload_btn.config(state=tk.NORMAL)
             self.run_btn.config(state=tk.NORMAL)
             self.status_lbl.config(text=f"Conectado a {url}", foreground="green")
-            self.append_log(f"Conectado a {url} como usuario '{user}'")
+            self.append_log(f"Conectado a {url} como '{user}'")
+
         except Exception as e:
             tb = traceback.format_exc()
             messagebox.showerror("Error conexión", f"No pude conectarme: {e}\n\n{tb}")
             self.append_log(f"ERROR conexión: {e}")
 
+    # ---------------------- Envío de comandos ----------------------
+
     def send_command(self):
-        if not self.proxy or not self.session:
+        if not self.cliente:
             messagebox.showwarning("No conectado", "Conecte primero al servidor")
             return
 
@@ -158,31 +158,18 @@ class interfaz_cl:
         if not raw:
             return
 
-        # Normalize similar to client_rpc's CLI
-        peticion = normalize(raw)
-
-        msg = serialize_message(self.session, peticion)
-        self.append_log(f"> {peticion} (serialized id={self.session.next_id-1})")
+        self.append_log(f"> {raw}")
         try:
-            res = self.proxy.RecibirMensaje(msg)
-            # Special handling for 'reporte' if server returns a serialized message
-            if peticion == "reporte" and isinstance(res, str):
-                parsed = parse_mensaje(res)
-                if parsed and parsed.get("tipo") == "string":
-                    self.append_log("==== REPORTE ====")
-                    self.append_log(parsed.get("valor", ""))
-                    self.append_log("=================")
-                    return
-
-            # For help/commands the server may return the help text
+            res = self.cliente.comando(raw)
             self.append_log("Servidor:", res)
         except Exception as e:
             tb = traceback.format_exc()
-            self.append_log(f"[RPC] Error: {e}")
-            self.append_log(tb)
+            self.append_log(f"[RPC] Error: {e}\n{tb}")
+
+    # ---------------------- Subir archivo ----------------------
 
     def upload_file(self):
-        if not self.proxy or not self.session:
+        if not self.cliente:
             messagebox.showwarning("No conectado", "Conecte primero al servidor")
             return
 
@@ -190,39 +177,33 @@ class interfaz_cl:
         if not path:
             return
 
+        self.append_log(f"> upload {os.path.basename(path)}")
         try:
-            b64 = b64_of_file(path)
-        except Exception as e:
-            messagebox.showerror("Archivo", f"No pude leer el archivo: {e}")
-            return
-
-        fname = os.path.basename(path)
-        payload = f"upload filename={fname} data={b64}"
-        msg = serialize_message(self.session, payload)
-        self.append_log(f"> upload {fname} (serialized id={self.session.next_id-1})")
-        try:
-            res = self.proxy.RecibirMensaje(msg)
+            res = self.cliente.upload(path)
             self.append_log("Servidor:", res)
         except Exception as e:
             self.append_log(f"[RPC] Error: {e}")
+
+    # ---------------------- Ejecutar archivo ----------------------
 
     def run_file(self):
-        if not self.proxy or not self.session:
+        if not self.cliente:
             messagebox.showwarning("No conectado", "Conecte primero al servidor")
             return
+
         fname = self.run_fname.get().strip()
         if not fname:
-            messagebox.showinfo("Uso", "Ingrese el nombre del archivo a ejecutar en 'Run filename'")
+            messagebox.showinfo("Uso", "Ingrese el nombre del archivo a ejecutar")
             return
 
-        payload = f"run filename={fname}"
-        msg = serialize_message(self.session, payload)
-        self.append_log(f"> run {fname} (serialized id={self.session.next_id-1})")
+        self.append_log(f"> run {fname}")
         try:
-            res = self.proxy.RecibirMensaje(msg)
+            res = self.cliente.run(fname)
             self.append_log("Servidor:", res)
         except Exception as e:
             self.append_log(f"[RPC] Error: {e}")
+
+    # ---------------------- Salida ----------------------
 
     def on_close(self):
         try:
@@ -231,9 +212,10 @@ class interfaz_cl:
             pass
 
     def run(self):
+        """Inicia el bucle principal de la interfaz."""
         self.root.mainloop()
 
 
 if __name__ == "__main__":
-    gui = interfaz_cl()
+    gui = InterfazCL()
     gui.run()
