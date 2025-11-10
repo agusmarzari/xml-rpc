@@ -122,16 +122,21 @@ void Controlador::desconectar() {
 }
 
 // ============================================================================
-// Envío de comando G-code y lectura de respuesta
+// Envío de comando G-code y lectura de respuesta (versión sincronizada)
 // ============================================================================
 std::string Controlador::enviarComandoGcode(const std::string& cmd) {
     if (fd < 0) return "ERROR: No conectado al Arduino.";
 
-    tcflush(fd, TCIOFLUSH);
+    // Limpiar residuos del buffer de entrada de ejecuciones previas
+    tcflush(fd, TCIFLUSH);
+    // Limpiar salida antes de enviar el nuevo comando  
+    tcflush(fd, TCOFLUSH);
+
     std::string payload = cmd + "\r\n";
     ::write(fd, payload.data(), payload.size());
     tcdrain(fd);
 
+    // Breve espera para que el Arduino empiece a procesar
     std::this_thread::sleep_for(std::chrono::milliseconds(150));
 
     std::string buffer;
@@ -141,25 +146,32 @@ std::string Controlador::enviarComandoGcode(const std::string& cmd) {
     int tmo = timeout_ms;  // valor base definido en Controlador.h
 
     if (cmd.find("G28") != std::string::npos) {
-    tmo = 5000;  // Homing puede tardar varios segundos
+        tmo = 5000;  // Homing puede tardar varios segundos
     }  
     else if (cmd.find("M3") != std::string::npos || cmd.find("M5") != std::string::npos) {
-    tmo = 2000;  // Gripper
+        tmo = 2000;  // Gripper
     }
 
     auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(tmo);
 
-
-    while (true) {
+    // ===============================================================
+    // Bucle de lectura mejorado: espera hasta recibir token final típico
+    // ===============================================================
+    while (std::chrono::steady_clock::now() < deadline) {
         int available = 0;
         ioctl(fd, FIONREAD, &available);
 
         if (available > 0) {
             ssize_t r = ::read(fd, tmp, sizeof(tmp));
             if (r > 0) buffer.append(tmp, tmp + r);
-        }
 
-        if (std::chrono::steady_clock::now() > deadline) break;
+            // 🔹 Si detectamos fin típico de respuesta, salimos del bucle
+            if (buffer.find("OK") != std::string::npos ||
+                buffer.find("INFO:") != std::string::npos ||
+                buffer.find("ERROR:") != std::string::npos) {
+                break;
+            }
+        }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
@@ -170,6 +182,7 @@ std::string Controlador::enviarComandoGcode(const std::string& cmd) {
 
     return buffer.empty() ? "SIN RESPUESTA" : buffer;
 }
+
 
 // ============================================================================
 // Detección automática de puertos serie
@@ -193,5 +206,3 @@ std::vector<std::string> Controlador::detectarPuertos() {
 
     return found;
 }
-
-
