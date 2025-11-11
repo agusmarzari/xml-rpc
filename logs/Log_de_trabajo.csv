@@ -258,3 +258,33 @@ timestamp,tipo,detalle,usuario,peticion,nodo,codigo
 2025-11-08 16:56:40,PETICION,Petición recibida,agustina,apagar motores,3,200
 2025-11-08 18:40:42,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
 2025-11-08 18:41:10,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-11-10 17:44:07,EVENTO_INFO,RecibirMensaje inicializado (conexion serie diferida),,,-1,200
+2025-11-10 17:44:07,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-11-10 17:44:13,EVENTO_INFO,Conexión serie con robot establecida,,,-1,200
+2025-11-10 17:48:41,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-11-10 17:48:47,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-11-10 17:48:47,PETICION,Petición recibida,agustina,mover brazo x=10,2,200
+2025-11-11 12:56:03,EVENTO_INFO,RecibirMensaje inicializado (conexion serie diferida),,,-1,200
+2025-11-11 12:56:03,EVENTO_INFO,Servidor escuchando en puerto 8080,,,-1,200
+2025-11-11 12:56:10,EVENTO_INFO,Conexión serie con robot establecida,,,-1,200
+2025-11-11 13:03:36,EVENTO_INFO,RecibirMensaje inicializado (conexion serie diferida),,,-1,200
+2025-11-11 13:03:36,EVENTO_INFO,Servidor escuchando en puerto 8000,,,-1,200
+2025-11-11 13:03:43,EVENTO_INFO,Conexión serie con robot establecida,,,-1,200
+2025-11-11 13:04:04,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-11-11 13:04:04,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-11-11 13:04:12,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-11-11 13:04:12,PETICION,Petición recibida,agustina,upload prueba.gcode,2,200
+2025-11-11 13:04:22,LOGIN_OK,Inicio de sesión exitoso,agustina,,3,200
+2025-11-11 13:04:27,PETICION,Petición recibida,agustina,run prueba.gcode,3,200
+2025-11-11 13:04:36,LOGIN_OK,Inicio de sesión exitoso,agustina,,4,200
+2025-11-11 13:04:36,PETICION,Petición recibida,agustina,apagar motores,4,200
+2025-11-11 15:09:10,EVENTO_INFO,RecibirMensaje inicializado (conexion serie diferida),,,-1,200
+2025-11-11 15:09:10,EVENTO_INFO,Servidor escuchando en puerto 8000,,,-1,200
+2025-11-11 15:09:10,EVENTO_WARNING,No se pudo establecer conexión serie con el robot,,,-1,500
+2025-11-11 15:09:50,EVENTO_INFO,RecibirMensaje inicializado (conexion serie diferida),,,-1,200
+2025-11-11 15:09:50,EVENTO_INFO,Servidor escuchando en puerto 8000,,,-1,200
+2025-11-11 15:09:57,EVENTO_INFO,Conexión serie con robot establecida,,,-1,200
+2025-11-11 15:10:31,LOGIN_OK,Inicio de sesión exitoso,agustina,,1,200
+2025-11-11 15:10:31,PETICION,Petición recibida,agustina,encender motores,1,200
+2025-11-11 15:12:53,LOGIN_OK,Inicio de sesión exitoso,agustina,,2,200
+2025-11-11 15:12:53,PETICION,Petición recibida,agustina,mover brazo x=30,2,200

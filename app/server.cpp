@@ -12,6 +12,7 @@
 #include <iterator>
 #include <thread>
 #include <chrono>
+#include <memory>
 
 #include "XmlRpc.h"
 #include "Mensaje.h"
@@ -22,6 +23,7 @@
 #include "Reporte.h"
 #include "base64.h"
 #include "Controlador.h"   // <<<< agregado
+#include "Archivo.h"       // <<<< agregado para usar Archivo
 
 using namespace XmlRpc;
 
@@ -94,6 +96,11 @@ private:
     // <<< integración Controlador >>>
     Controlador controlador_;
     std::atomic<bool> robotConectado_{false};
+
+    // === Estado de grabación de trayectoria (modo “grabación”) ===
+    bool grabacionActiva_ = false;                       // <<<< agregado
+    std::unique_ptr<Archivo> archivoGrabacion_;          // <<<< agregado
+    std::string nombreTrayectoria_;                      // <<<< agregado
 
 public:
     RecibirMensaje(XmlRpcServer* s) : XmlRpcServerMethod("RecibirMensaje", s) {
@@ -187,6 +194,8 @@ public:
                 "  on | off | grip on | grip off | home | reporte | status\n"
                 "  abs | rel | mover x=.. y=.. z=..\n"
                 "  upload <archivo.gcode> | run <archivo.gcode>\n"
+                "  guardar trayectoria=<archivo.gcode>\n"
+                "  fin trayectoria\n"
                 "Comandos admin:\n"
                 "  admin acceso on | admin acceso off\n"
                 "  admin log N  (ultimas N lineas del log)\n"
@@ -291,6 +300,93 @@ public:
             return;
         }
 
+        // ===== NUEVO: Modo GRABACIÓN (con estado, usando Archivo) =====
+        // guardar trayectoria=<archivo.gcode>
+        if (peticion.rfind("guardar trayectoria=", 0) == 0) {
+            if (grabacionActiva_) {
+                result = "Ya hay una grabación en curso: " + nombreTrayectoria_;
+                return;
+            }
+
+            std::string fname;
+            if (!extractKV(peticion, "guardar trayectoria", fname)) {
+                size_t eq = peticion.find('=');
+                if (eq != std::string::npos) fname = trim(peticion.substr(eq + 1));
+            }
+            if (fname.empty()) {
+                result = "Error: use guardar trayectoria=<nombre>.gcode";
+                logger.logEvento(PALogger::LogLevel::ERROR, "guardar trayectoria: nombre vacío",
+                                 PALogger::Code::BAD_REQUEST, msg.getID());
+                return;
+            }
+            // normalizar a basename
+            if (auto pos = fname.find_last_of("/\\"); pos != std::string::npos) fname = fname.substr(pos + 1);
+            // agregar .gcode si no hay extensión
+            if (fname.find('.') == std::string::npos) fname += ".gcode";
+
+            ensureUploadsDir();
+            std::filesystem::path ruta = std::filesystem::path("uploads") / fname;
+
+            archivoGrabacion_ = std::make_unique<Archivo>(ruta.string());
+            if (!archivoGrabacion_->open(std::ios::out | std::ios::trunc)) {
+                result = "Error: no se pudo crear el archivo en uploads/.";
+                archivoGrabacion_.reset();
+                logger.logEvento(PALogger::LogLevel::ERROR, "guardar trayectoria: fallo crear " + fname,
+                                 PALogger::Code::SERVER_ERROR, msg.getID());
+                return;
+            }
+
+            grabacionActiva_ = true;
+            nombreTrayectoria_ = fname;
+
+            logger.logPeticion(usuario.getNombre(), "guardar trayectoria=" + fname, msg.getID(), PALogger::Code::OK);
+            result = "Grabación iniciada: " + fname + ". Envíe comandos paso a paso y finalice con 'fin trayectoria'.";
+            return;
+        }
+
+        // fin trayectoria
+        if (peticion == "fin trayectoria") {
+            if (!grabacionActiva_) {
+                result = "No hay grabación activa.";
+                return;
+            }
+
+            archivoGrabacion_->close();
+            grabacionActiva_ = false;
+
+            logger.logPeticion(usuario.getNombre(), "fin trayectoria", msg.getID(), PALogger::Code::OK);
+            result = "Grabación finalizada: " + nombreTrayectoria_ + ". Puede ejecutar con 'run " + nombreTrayectoria_ + "'";
+            nombreTrayectoria_.clear();
+            return;
+        }
+
+        // Mientras haya grabación activa: traducir y guardar (no ejecutar)
+        if (grabacionActiva_) {
+            InterpreteDeComandos interprete;
+            std::string gcode = interprete.traducir(peticion);
+
+            if (gcode.rfind("ERR:", 0) == 0) {
+                result = "Error al interpretar comando durante grabación.";
+                logger.logEvento(PALogger::LogLevel::ERROR,
+                                 "Grabación: error al interpretar '" + peticion + "'",
+                                 PALogger::Code::BAD_REQUEST, msg.getID());
+                return;
+            }
+
+            bool ok = archivoGrabacion_->writeLine(gcode);
+            if (!ok) {
+                result = "Error: no se pudo escribir en archivo de grabación.";
+                logger.logEvento(PALogger::LogLevel::ERROR,
+                                 "Grabación: error al escribir '" + gcode + "'",
+                                 PALogger::Code::SERVER_ERROR, msg.getID());
+                return;
+            }
+
+            logger.logPeticion(usuario.getNombre(), "grabar " + nombreTrayectoria_ + ": " + gcode, msg.getID(), PALogger::Code::OK);
+            result = "Guardado en " + nombreTrayectoria_ + ": " + gcode;
+            return;
+        }
+
         // ===== Manejo especial: UPLOAD / RUN =====
 
         // upload filename=... data=...
@@ -375,7 +471,6 @@ public:
                 std::string respuesta = controlador_.enviarComandoGcode(line);
                 respLog << "L" << n << ": `" << line << "` -> `" << respuesta << "`\n";
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
             }
             f.close();
 
@@ -444,7 +539,8 @@ public:
 
     std::string help() override {
         return "Valida usuario, maneja admin acceso/log, upload/run, 'reporte' y traduccion a G-code, "
-               "con robot serie conectado por defecto, y admin: conectar/desconectar.";
+               "con robot serie conectado por defecto, y admin: conectar/desconectar. "
+               "Tambien permite: 'guardar trayectoria=<archivo>.gcode' y 'fin trayectoria' para grabar paso a paso.";
     }
 };
 
@@ -485,3 +581,5 @@ int main(int argc, char* argv[]) {
     logger.logEvento(PALogger::LogLevel::INFO, "Servidor finalizado correctamente");
     return 0;
 }
+
+

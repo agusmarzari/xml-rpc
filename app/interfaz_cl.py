@@ -19,7 +19,7 @@ Ejecución:
 import os
 import traceback
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, scrolledtext
+from tkinter import ttk, filedialog, messagebox, scrolledtext, simpledialog
 
 # Importar la versión modular del cliente
 from cliente.cliente import ClienteRPC
@@ -28,14 +28,15 @@ from cliente.usuario import Usuario
 
 class InterfazCL:
     """GUI del cliente RPC (Tkinter). Permite conectar, enviar comandos,
-    subir y ejecutar archivos GCODE."""
+    subir, ejecutar archivos GCODE y grabar trayectorias paso a paso."""
 
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Cliente RPC - GUI")
-        self.root.geometry("760x520")
+        self.root.geometry("780x560")
 
         self.cliente = None  # instancia de ClienteRPC
+        self.grabacion_activa = False  # nuevo flag de estado de grabación
 
         self._build_widgets()
 
@@ -92,6 +93,17 @@ class InterfazCL:
         self.run_btn = ttk.Button(cmdfrm, text="Run", command=self.run_file, state=tk.DISABLED)
         self.run_btn.grid(row=1, column=5)
 
+        # --- NUEVO: Grabación de trayectoria ---
+        self.record_start_btn = ttk.Button(
+            cmdfrm, text="Iniciar grabación", command=self.iniciar_grabacion, state=tk.DISABLED
+        )
+        self.record_start_btn.grid(row=2, column=1, pady=6)
+
+        self.record_end_btn = ttk.Button(
+            cmdfrm, text="Finalizar grabación", command=self.finalizar_grabacion, state=tk.DISABLED
+        )
+        self.record_end_btn.grid(row=2, column=2, pady=6)
+
         # --- Log / Respuestas ---
         logfrm = ttk.LabelFrame(frm, text="Registro / Respuestas")
         logfrm.pack(fill=tk.BOTH, expand=True, padx=4, pady=6)
@@ -139,6 +151,8 @@ class InterfazCL:
             self.send_btn.config(state=tk.NORMAL)
             self.upload_btn.config(state=tk.NORMAL)
             self.run_btn.config(state=tk.NORMAL)
+            self.record_start_btn.config(state=tk.NORMAL)
+            self.record_end_btn.config(state=tk.NORMAL)
             self.status_lbl.config(text=f"Conectado a {url}", foreground="green")
             self.append_log(f"Conectado a {url} como '{user}'")
 
@@ -203,6 +217,49 @@ class InterfazCL:
         except Exception as e:
             self.append_log(f"[RPC] Error: {e}")
 
+    # ---------------------- NUEVO: Grabación de trayectoria ----------------------
+
+    def iniciar_grabacion(self):
+        """Envía al servidor la orden de iniciar grabación."""
+        if not self.cliente:
+            messagebox.showwarning("No conectado", "Conecte primero al servidor")
+            return
+
+        nombre = simpledialog.askstring("Guardar trayectoria", "Ingrese nombre del archivo (sin extensión):")
+        if not nombre:
+            messagebox.showinfo("Grabación", "Operación cancelada.")
+            return
+
+        comando = f"guardar trayectoria={nombre}.gcode"
+        self.append_log(f"> {comando}")
+
+        try:
+            res = self.cliente.comando(comando)
+            self.append_log("Servidor:", res)
+            self.grabacion_activa = True
+        except Exception as e:
+            self.append_log(f"[RPC] Error al iniciar grabación: {e}")
+
+    def finalizar_grabacion(self):
+        """Envía al servidor la orden de finalizar grabación."""
+        if not self.cliente:
+            messagebox.showwarning("No conectado", "Conecte primero al servidor")
+            return
+
+        if not self.grabacion_activa:
+            messagebox.showinfo("Grabación", "No hay una grabación activa.")
+            return
+
+        comando = "fin trayectoria"
+        self.append_log(f"> {comando}")
+
+        try:
+            res = self.cliente.comando(comando)
+            self.append_log("Servidor:", res)
+            self.grabacion_activa = False
+        except Exception as e:
+            self.append_log(f"[RPC] Error al finalizar grabación: {e}")
+
     # ---------------------- Salida ----------------------
 
     def on_close(self):
@@ -219,3 +276,5 @@ class InterfazCL:
 if __name__ == "__main__":
     gui = InterfazCL()
     gui.run()
+
+
